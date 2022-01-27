@@ -5,7 +5,7 @@ import datetime
 import wikipedia
 import pyjokes
 
-
+listener = sr.Recognizer()
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
@@ -17,35 +17,29 @@ def talk(text):
 
 
 def take_command():
-    r=sr.Recognizer()
-    with sr.Microphone() as source:
-        print('listening')
-        r.energy_threshold = 500
-        r.pause_threshold = 1
-        audio = r.listen(source)
-
     try:
-        print('regonitioning.....')
-        command= r.recognize_google(audio, language='en-in')
-        print("user said: ",command)
-
-    except Exception as e:
-        print('say it again please....')
-        return "none"
+        with sr.Microphone() as source:
+            print('listening...')
+            voice = listener.listen(source)
+            command = listener.recognize_google(voice)
+            command = command.lower()
+            if 'alexa' in command:
+                command = command.replace('alexa', '')
+                print(command)
+    except:
+        pass
     return command
 
-    
-            
-talk("this is vairab roy and we want to convert it more sequently features")
-while True:
-    command = take_command().lower()
+
+def run_alexa():
+    command = take_command()
     print(command)
     if 'play' in command:
         song = command.replace('play', '')
         talk('playing ' + song)
         pywhatkit.playonyt(song)
     elif 'time' in command:
-        time = datetime.datetime.now().strftime('%H:%M %S')
+        time = datetime.datetime.now().strftime('%I:%M %p')
         talk('Current time is ' + time)
     elif 'who the heck is' in command:
         person = command.replace('who the heck is', '')
@@ -60,3 +54,7 @@ while True:
         talk(pyjokes.get_joke())
     else:
         talk('Please say the command again.')
+
+
+while True:
+    run_alexa()
